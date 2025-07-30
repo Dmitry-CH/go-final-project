@@ -1,19 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
-	"os"
-	"strconv"
 
 	"github.com/Dmitry-CH/go-final-project/pkg/db"
+	"github.com/Dmitry-CH/go-final-project/pkg/server"
 	"github.com/joho/godotenv"
 )
-
-const webDir = "web"
-
-var port = 7540
 
 func main() {
 	err := godotenv.Load()
@@ -28,16 +21,7 @@ func main() {
 	}
 	defer db.Close()
 
-	envPort := os.Getenv("TODO_PORT")
-	if len(envPort) > 0 {
-		if eport, err := strconv.ParseInt(envPort, 10, 32); err == nil {
-			port = int(eport)
-		}
-	}
-
-	http.Handle("/", http.FileServer(http.Dir(webDir)))
-
-	err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	err = server.Run()
 	if err != nil {
 		log.Fatalf("Start server error: %s", err.Error())
 	}
