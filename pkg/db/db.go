@@ -21,9 +21,9 @@ var db *sql.DB
 var dbFile = "scheduler.db"
 
 func Init() error {
-	_, err := os.Stat(dbFile)
-
 	var install bool
+
+	_, err := os.Stat(dbFile)
 	if err != nil {
 		install = true
 	}
@@ -33,7 +33,7 @@ func Init() error {
 		dbFile = envDbFile
 	}
 
-	db, err := sql.Open("sqlite", dbFile)
+	db, err = sql.Open("sqlite", dbFile)
 	if err != nil {
 		return err
 	}
