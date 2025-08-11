@@ -10,12 +10,8 @@ import (
 	"github.com/Dmitry-CH/go-final-project/pkg/db"
 )
 
-type successResponse struct {
+type IDResp struct {
 	ID int64 `json:"id"`
-}
-
-type failedResponse struct {
-	Error string `json:"error"`
 }
 
 func checkDate(task *db.Task) error {
@@ -49,48 +45,42 @@ func checkDate(task *db.Task) error {
 	return nil
 }
 
-func writeJson(w http.ResponseWriter, data any, code int) {
-	resp, err := json.Marshal(data)
-	if err != nil {
-		resp = []byte(`{"error": "ошибка сериализации JSON"}`)
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(code)
-	w.Write(resp)
-}
-
 func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var buf bytes.Buffer
 	var task db.Task
 
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		writeJson(w, failedResponse{err.Error()}, http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		writeErrJson(w, err.Error())
 		return
 	}
 
 	err = json.Unmarshal(buf.Bytes(), &task)
 	if err != nil {
-		writeJson(w, failedResponse{"ошибка десериализации JSON"}, http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		writeErrJson(w, "ошибка десериализации JSON")
 		return
 	}
 	if len(task.Title) == 0 {
-		writeJson(w, failedResponse{"ошибка не указан заголовок задачи"}, http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		writeErrJson(w, "ошибка не указан заголовок задачи")
 		return
 	}
 
 	err = checkDate(&task)
 	if err != nil {
-		writeJson(w, failedResponse{err.Error()}, http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		writeErrJson(w, err.Error())
 		return
 	}
 
 	id, err := db.AddTask(&task)
 	if err != nil {
-		writeJson(w, failedResponse{err.Error()}, http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		writeErrJson(w, err.Error())
 		return
 	}
 
-	writeJson(w, successResponse{id}, http.StatusOK)
+	writeJson(w, IDResp{id})
 }
