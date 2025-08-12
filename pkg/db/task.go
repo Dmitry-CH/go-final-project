@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 )
 
@@ -35,7 +36,46 @@ func AddTask(task *Task) (int64, error) {
 	return id, nil
 }
 
-func Tasks(limit int, search, date string) ([]*Task, error) {
+func UpdateTask(task *Task) error {
+	query := `UPDATE scheduler
+					SET date = :date, title = :title, comment = :comment, repeat = :repeat
+					WHERE id = :id;`
+
+	res, err := db.Exec(query,
+		sql.Named("id", task.ID),
+		sql.Named("date", task.Date),
+		sql.Named("title", task.Title),
+		sql.Named("comment", task.Comment),
+		sql.Named("repeat", task.Repeat))
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return errors.New("incorrect id for updating task")
+	}
+
+	return nil
+}
+
+func GetTask(id string) (*Task, error) {
+	var task Task
+	query := `SELECT * FROM scheduler WHERE id = :id;`
+
+	row := db.QueryRow(query, sql.Named("id", id))
+	err := row.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
+	if err != nil {
+		return &Task{}, err
+	}
+
+	return &task, nil
+}
+
+func GetTasks(limit int, search, date string) ([]*Task, error) {
 	tasks := make([]*Task, 0)
 	query := `SELECT * FROM scheduler ORDER BY date LIMIT :limit;`
 
@@ -45,7 +85,7 @@ func Tasks(limit int, search, date string) ([]*Task, error) {
 	}
 
 	if len(date) > 0 {
-		query = `SELECT * FROM scheduler WHERE date = :date LIMIT :limit`
+		query = `SELECT * FROM scheduler WHERE date = :date LIMIT :limit;`
 	}
 
 	rows, err := db.Query(query,

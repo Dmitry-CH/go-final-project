@@ -51,34 +51,29 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		writeErrJson(w, err.Error())
+		writeJson(w, ErrResp{err.Error()}, http.StatusBadRequest)
 		return
 	}
 
 	err = json.Unmarshal(buf.Bytes(), &task)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		writeErrJson(w, "ошибка десериализации JSON")
+		writeJson(w, ErrResp{"ошибка десериализации JSON"}, http.StatusBadRequest)
 		return
 	}
 	if len(task.Title) == 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		writeErrJson(w, "ошибка не указан заголовок задачи")
+		writeJson(w, ErrResp{"ошибка не указан заголовок задачи"}, http.StatusBadRequest)
 		return
 	}
 
 	err = checkDate(&task)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		writeErrJson(w, err.Error())
+		writeJson(w, ErrResp{err.Error()}, http.StatusBadRequest)
 		return
 	}
 
 	id, err := db.AddTask(&task)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		writeErrJson(w, err.Error())
+		writeJson(w, ErrResp{err.Error()}, http.StatusInternalServerError)
 		return
 	}
 

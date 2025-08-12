@@ -10,14 +10,6 @@ import (
 
 const DATE_FORMAT = "20060102"
 
-func addDate(date time.Time, s ...int) time.Time {
-	return date.AddDate(s[0], s[1], s[2])
-}
-
-func afterNow(date, now time.Time) bool {
-	return date.After(now)
-}
-
 func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	if len(repeat) == 0 {
 		return "", errors.New("ошибка в параметре 'repeat' — пустая строка")
@@ -60,6 +52,14 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	}
 
 	return date.Format(DATE_FORMAT), nil
+}
+
+func addDate(date time.Time, s ...int) time.Time {
+	return date.AddDate(s[0], s[1], s[2])
+}
+
+func afterNow(date, now time.Time) bool {
+	return date.After(now)
 }
 
 func nextDateHandler(w http.ResponseWriter, r *http.Request) {

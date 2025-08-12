@@ -23,10 +23,9 @@ func tasksHandler(w http.ResponseWriter, r *http.Request) {
 		search = ""
 	}
 
-	tasks, err := db.Tasks(50, search, date)
+	tasks, err := db.GetTasks(50, search, date)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		writeErrJson(w, err.Error())
+		writeJson(w, ErrResp{err.Error()}, http.StatusInternalServerError)
 		return
 	}
 

@@ -8,21 +8,20 @@ import (
 
 const webDir = "web"
 
-func writeErrJson(w http.ResponseWriter, msg string) {
-	resp := []byte(fmt.Sprintf(`{"error": "%s"}`, msg))
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Write(resp)
+type ErrResp struct {
+	Error string `json:"error"`
 }
 
-func writeJson(w http.ResponseWriter, data any) {
+func writeJson(w http.ResponseWriter, data any, statusCode ...int) {
 	resp, err := json.Marshal(data)
 	if err != nil {
-		writeErrJson(w, err.Error())
-		return
+		resp = []byte(fmt.Sprintf(`{"error": "%s"}`, err.Error()))
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	if len(statusCode) > 0 {
+		w.WriteHeader(statusCode[0])
+	}
 	w.Write(resp)
 }
 
