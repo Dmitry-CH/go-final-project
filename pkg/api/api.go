@@ -12,6 +12,14 @@ type ErrResp struct {
 	Error string `json:"error"`
 }
 
+func Init() {
+	http.Handle("/", http.FileServer(http.Dir(webDir)))
+	http.HandleFunc("GET  /api/nextdate", nextDateHandler)
+	http.HandleFunc("     /api/task", taskHandler)
+	http.HandleFunc("POST /api/task/done", taskDoneHandler)
+	http.HandleFunc("GET  /api/tasks", tasksHandler)
+}
+
 func writeJson(w http.ResponseWriter, data any, statusCode ...int) {
 	resp, err := json.Marshal(data)
 	if err != nil {
@@ -23,11 +31,4 @@ func writeJson(w http.ResponseWriter, data any, statusCode ...int) {
 		w.WriteHeader(statusCode[0])
 	}
 	w.Write(resp)
-}
-
-func Init() {
-	http.Handle("/", http.FileServer(http.Dir(webDir)))
-	http.HandleFunc("GET /api/nextdate", nextDateHandler)
-	http.HandleFunc("/api/tasks", tasksHandler)
-	http.HandleFunc("/api/task", taskHandler)
 }
