@@ -28,9 +28,9 @@ func Init() error {
 		install = true
 	}
 
-	envDbFile := os.Getenv("TODO_DBFILE")
-	if len(envDbFile) > 0 {
-		dbFile = envDbFile
+	eDbFile := os.Getenv("TODO_DBFILE")
+	if len(eDbFile) > 0 {
+		dbFile = eDbFile
 	}
 
 	db, err = sql.Open("sqlite", dbFile)

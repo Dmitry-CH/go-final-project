@@ -12,9 +12,9 @@ import (
 var port = 7540
 
 func Run() error {
-	envPort := os.Getenv("TODO_PORT")
-	if len(envPort) > 0 {
-		if eport, err := strconv.ParseInt(envPort, 10, 32); err == nil {
+	ePort := os.Getenv("TODO_PORT")
+	if len(ePort) > 0 {
+		if eport, err := strconv.ParseInt(ePort, 10, 32); err == nil {
 			port = int(eport)
 		}
 	}

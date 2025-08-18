@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+
+	"github.com/golang-jwt/jwt"
 )
 
 const webDir = "web"
@@ -15,9 +18,47 @@ type ErrResp struct {
 func Init() {
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 	http.HandleFunc("GET  /api/nextdate", nextDateHandler)
-	http.HandleFunc("     /api/task", taskHandler)
-	http.HandleFunc("POST /api/task/done", taskDoneHandler)
-	http.HandleFunc("GET  /api/tasks", tasksHandler)
+	http.HandleFunc("POST /api/signin", signinHandler)
+	http.HandleFunc("     /api/task", auth(taskHandler))
+	http.HandleFunc("POST /api/task/done", auth(taskDoneHandler))
+	http.HandleFunc("GET  /api/tasks", auth(tasksHandler))
+}
+
+func auth(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ePass := os.Getenv("TODO_PASSWORD")
+		if len(ePass) > 0 {
+			var rToken string
+			var valid bool
+
+			cookie, err := r.Cookie("token")
+			if err == nil {
+				rToken = cookie.Value
+			}
+
+			jwtToken, err := jwt.Parse(rToken, func(t *jwt.Token) (any, error) {
+				return secretKey, nil
+			})
+			if err != nil {
+				writeJson(w, ErrResp{"error failed to parse token"}, http.StatusInternalServerError)
+				return
+			}
+
+			if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok && jwtToken.Valid {
+				pass, ok := claims["pass"]
+				if ok {
+					valid = pass == generateSum(ePass)
+				}
+			}
+
+			if !valid {
+				writeJson(w, ErrResp{"error authentification required"}, http.StatusUnauthorized)
+				return
+			}
+		}
+
+		next(w, r)
+	})
 }
 
 func writeJson(w http.ResponseWriter, data any, statusCode ...int) {
