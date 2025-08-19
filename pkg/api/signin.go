@@ -17,23 +17,13 @@ var ErrBadSignToken = errors.New("ошибка не удалось подпис�
 
 var secretKey = []byte("my_secret_key")
 
-type TokenResp struct {
-	Token string `json:"token"`
-}
-
-type User struct {
+type user struct {
 	Password string `json:"password"`
-}
-
-func generateSum(s string) string {
-	hash := md5.Sum([]byte(s))
-
-	return hex.EncodeToString(hash[:])
 }
 
 func signinHandler(w http.ResponseWriter, r *http.Request) {
 	var buf bytes.Buffer
-	var user User
+	var user user
 
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
@@ -65,4 +55,10 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJson(w, TokenResp{signedToken})
+}
+
+func generateSum(s string) string {
+	hash := md5.Sum([]byte(s))
+
+	return hex.EncodeToString(hash[:])
 }

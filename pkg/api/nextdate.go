@@ -54,14 +54,6 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	return date.Format(DATE_FORMAT), nil
 }
 
-func addDate(date time.Time, s ...int) time.Time {
-	return date.AddDate(s[0], s[1], s[2])
-}
-
-func afterNow(date, now time.Time) bool {
-	return date.After(now)
-}
-
 func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 	rNow := r.FormValue("now")
 	rDate := r.FormValue("date")
@@ -92,4 +84,12 @@ func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "ошибка сервера", http.StatusInternalServerError)
 		return
 	}
+}
+
+func addDate(date time.Time, s ...int) time.Time {
+	return date.AddDate(s[0], s[1], s[2])
+}
+
+func afterNow(date, now time.Time) bool {
+	return date.After(now)
 }

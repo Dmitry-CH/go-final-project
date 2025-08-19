@@ -20,6 +20,10 @@ CREATE INDEX idx_scheduler_date ON scheduler (date);`
 var db *sql.DB
 var dbFile = "scheduler.db"
 
+func Close() error {
+	return db.Close()
+}
+
 func Init() error {
 	var install bool
 
@@ -46,8 +50,4 @@ func Init() error {
 	}
 
 	return nil
-}
-
-func Close() error {
-	return db.Close()
 }

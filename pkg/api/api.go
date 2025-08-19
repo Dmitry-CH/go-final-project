@@ -6,13 +6,28 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Dmitry-CH/go-final-project/pkg/db"
 	"github.com/golang-jwt/jwt"
 )
 
 const webDir = "web"
 
+type EmpResp struct{}
+
 type ErrResp struct {
 	Error string `json:"error"`
+}
+
+type IDResp struct {
+	ID int64 `json:"id"`
+}
+
+type TasksResp struct {
+	Tasks []*db.Task `json:"tasks"`
+}
+
+type TokenResp struct {
+	Token string `json:"token"`
 }
 
 func Init() {

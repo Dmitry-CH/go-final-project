@@ -8,8 +8,6 @@ import (
 	"github.com/Dmitry-CH/go-final-project/pkg/db"
 )
 
-type EmpResp struct{}
-
 func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var buf bytes.Buffer
 	var task db.Task

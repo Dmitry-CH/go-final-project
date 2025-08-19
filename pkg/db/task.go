@@ -36,55 +36,6 @@ func AddTask(task *Task) (int64, error) {
 	return id, nil
 }
 
-func UpdateTask(task *Task) error {
-	query := `UPDATE scheduler
-					SET date = :date, title = :title, comment = :comment, repeat = :repeat
-					WHERE id = :id;`
-
-	res, err := db.Exec(query,
-		sql.Named("id", task.ID),
-		sql.Named("date", task.Date),
-		sql.Named("title", task.Title),
-		sql.Named("comment", task.Comment),
-		sql.Named("repeat", task.Repeat))
-	if err != nil {
-		return err
-	}
-
-	count, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if count == 0 {
-		return errors.New("incorrect id for updating task")
-	}
-
-	return nil
-}
-
-func UpdateTaskDate(next string, id string) error {
-	query := `UPDATE scheduler
-					SET date = :date
-					WHERE id = :id;`
-
-	res, err := db.Exec(query,
-		sql.Named("id", id),
-		sql.Named("date", next))
-	if err != nil {
-		return err
-	}
-
-	count, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if count == 0 {
-		return errors.New("incorrect id for updating task")
-	}
-
-	return nil
-}
-
 func DeleteTask(id string) error {
 	query := `DELETE FROM scheduler
 					WHERE id = :id;`
@@ -153,4 +104,53 @@ func GetTasks(limit int, search, date string) ([]*Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func UpdateTask(task *Task) error {
+	query := `UPDATE scheduler
+					SET date = :date, title = :title, comment = :comment, repeat = :repeat
+					WHERE id = :id;`
+
+	res, err := db.Exec(query,
+		sql.Named("id", task.ID),
+		sql.Named("date", task.Date),
+		sql.Named("title", task.Title),
+		sql.Named("comment", task.Comment),
+		sql.Named("repeat", task.Repeat))
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return errors.New("incorrect id for updating task")
+	}
+
+	return nil
+}
+
+func UpdateTaskDate(next string, id string) error {
+	query := `UPDATE scheduler
+					SET date = :date
+					WHERE id = :id;`
+
+	res, err := db.Exec(query,
+		sql.Named("id", id),
+		sql.Named("date", next))
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return errors.New("incorrect id for updating task")
+	}
+
+	return nil
 }

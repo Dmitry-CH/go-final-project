@@ -7,10 +7,6 @@ import (
 	"github.com/Dmitry-CH/go-final-project/pkg/db"
 )
 
-type TasksResp struct {
-	Tasks []*db.Task `json:"tasks"`
-}
-
 func tasksHandler(w http.ResponseWriter, r *http.Request) {
 	rSearch := r.URL.Query().Get("search")
 
