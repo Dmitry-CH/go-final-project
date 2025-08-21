@@ -20,11 +20,11 @@ func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(buf.Bytes(), &task)
 	if err != nil {
-		writeJson(w, ErrResp{"ошибка десериализации JSON"}, http.StatusBadRequest)
+		writeJson(w, ErrResp{err.Error()}, http.StatusBadRequest)
 		return
 	}
 	if len(task.Title) == 0 {
-		writeJson(w, ErrResp{"ошибка не указан заголовок задачи"}, http.StatusBadRequest)
+		writeJson(w, ErrResp{"title required"}, http.StatusBadRequest)
 		return
 	}
 

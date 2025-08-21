@@ -55,7 +55,7 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 				return secretKey, nil
 			})
 			if err != nil {
-				writeJson(w, ErrResp{"error failed to parse token"}, http.StatusUnauthorized)
+				writeJson(w, ErrResp{"failed to parse token"}, http.StatusUnauthorized)
 				return
 			}
 
@@ -67,7 +67,7 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 			}
 
 			if !valid {
-				writeJson(w, ErrResp{"error authentification required"}, http.StatusUnauthorized)
+				writeJson(w, ErrResp{"authentification required"}, http.StatusUnauthorized)
 				return
 			}
 		}

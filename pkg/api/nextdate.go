@@ -12,12 +12,12 @@ const DATE_FORMAT = "20060102"
 
 func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	if len(repeat) == 0 {
-		return "", errors.New("ошибка в параметре 'repeat' — пустая строка")
+		return "", errors.New("there is an empty string in the 'repeat' parameter")
 	}
 
 	date, err := time.Parse(DATE_FORMAT, dstart)
 	if err != nil {
-		return "", errors.New("ошибка время в параметре 'dstart' не может быть преобразовано в корректную дату")
+		return "", errors.New("value specified for the 'startDate' parameter is not a valid date")
 	}
 
 	rule := strings.Split(repeat, " ")
@@ -26,22 +26,22 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	switch rule[0] {
 	case "d":
 		if len(rule) < 2 {
-			return "", errors.New("ошибка указан неверный формат 'repeat' - не указан интервал в днях")
+			return "", errors.New("invalid format 'repeat' - interval in days is not specified")
 		}
 
 		days, err := strconv.Atoi(rule[1])
 		if err != nil {
-			return "", errors.New("ошибка указан неверный формат 'repeat' - недопустимый символ")
+			return "", errors.New("invalid format 'repeat' - invalid character")
 		}
 		if days > 400 {
-			return "", errors.New("ошибка указан неверный формат 'repeat' - превышен максимально допустимый интервал")
+			return "", errors.New("invalid format 'repeat' - maximum allowed interval has been exceeded")
 		}
 
 		interval = []int{0, 0, days}
 	case "y":
 		interval = []int{1, 0, 0}
 	default:
-		return "", errors.New("ошибка указан неверный формат 'repeat' - неподдерживаемый формат")
+		return "", errors.New("invalid format 'repeat' - unsupported format")
 	}
 
 	for {
@@ -81,7 +81,7 @@ func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err = w.Write([]byte(nextDate))
 	if err != nil {
-		http.Error(w, "ошибка сервера", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }

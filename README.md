@@ -39,6 +39,8 @@ API содержит следующие операции:
 
 ## Запуск тестов
 
+    go clean -testcache
+
     env TODO_PASSWORD=qwerty TODO_PORT=8080 go test -v ./tests
 
 Все настройки для запуска тестов уже определены в файле `tests\settings.go`

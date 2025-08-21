@@ -22,11 +22,11 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(buf.Bytes(), &task)
 	if err != nil {
-		writeJson(w, ErrResp{"ошибка десериализации JSON"}, http.StatusBadRequest)
+		writeJson(w, ErrResp{err.Error()}, http.StatusBadRequest)
 		return
 	}
 	if len(task.Title) == 0 {
-		writeJson(w, ErrResp{"ошибка не указан заголовок задачи"}, http.StatusBadRequest)
+		writeJson(w, ErrResp{"title required"}, http.StatusBadRequest)
 		return
 	}
 
@@ -55,7 +55,7 @@ func checkDate(task *db.Task) error {
 
 	t, err := time.Parse(DATE_FORMAT, task.Date)
 	if err != nil {
-		return errors.New("ошибка дата представлена в формате, отличном от 20060102")
+		return errors.New("date is presented in a format other than 20060102")
 	}
 
 	if afterNow(now, t) {
@@ -65,7 +65,7 @@ func checkDate(task *db.Task) error {
 		} else {
 			next, err := NextDate(now, task.Date, task.Repeat)
 			if err != nil {
-				return errors.New("ошибка правило повторения указано в неправильном формате")
+				return errors.New("repetition rule is specified in the wrong format")
 			}
 
 			// в противном случае, берём вычисленную ранее следующую дату

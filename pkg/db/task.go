@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+var errInvalidId = errors.New("incorrect id for updating task")
+
 type Task struct {
 	ID      string `json:"id"`
 	Date    string `json:"date"`
@@ -50,7 +52,7 @@ func DeleteTask(id string) error {
 		return err
 	}
 	if count == 0 {
-		return errors.New("incorrect id for updating task")
+		return errors.New("incorrect id for deleting task")
 	}
 
 	return nil
@@ -58,7 +60,8 @@ func DeleteTask(id string) error {
 
 func GetTask(id string) (*Task, error) {
 	var task Task
-	query := `SELECT * FROM scheduler WHERE id = :id;`
+	query := `SELECT * FROM scheduler
+					WHERE id = :id;`
 
 	row := db.QueryRow(query, sql.Named("id", id))
 	err := row.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
@@ -74,12 +77,14 @@ func GetTasks(limit int, search, date string) ([]*Task, error) {
 	query := `SELECT * FROM scheduler ORDER BY date LIMIT :limit;`
 
 	if len(search) > 0 {
-		query = `SELECT * FROM scheduler WHERE title LIKE :search OR comment LIKE :search ORDER BY date LIMIT :limit;`
+		query = `SELECT * FROM scheduler
+						WHERE title LIKE :search OR comment LIKE :search ORDER BY date LIMIT :limit;`
 		search = fmt.Sprintf(`%%%s%%`, search)
 	}
 
 	if len(date) > 0 {
-		query = `SELECT * FROM scheduler WHERE date = :date LIMIT :limit;`
+		query = `SELECT * FROM scheduler
+						WHERE date = :date LIMIT :limit;`
 	}
 
 	rows, err := db.Query(query,
@@ -126,7 +131,7 @@ func UpdateTask(task *Task) error {
 		return err
 	}
 	if count == 0 {
-		return errors.New("incorrect id for updating task")
+		return errInvalidId
 	}
 
 	return nil
@@ -149,7 +154,7 @@ func UpdateTaskDate(next string, id string) error {
 		return err
 	}
 	if count == 0 {
-		return errors.New("incorrect id for updating task")
+		return errInvalidId
 	}
 
 	return nil

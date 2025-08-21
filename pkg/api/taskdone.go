@@ -12,14 +12,14 @@ func taskDoneHandler(w http.ResponseWriter, r *http.Request) {
 
 	task, err := db.GetTask(rId)
 	if err != nil {
-		writeJson(w, ErrResp{ErrGetTask.Error()}, http.StatusInternalServerError)
+		writeJson(w, ErrResp{err.Error()}, http.StatusInternalServerError)
 		return
 	}
 
 	if len(task.Repeat) == 0 {
 		err = db.DeleteTask(rId)
 		if err != nil {
-			writeJson(w, ErrResp{ErrGetTask.Error()}, http.StatusInternalServerError)
+			writeJson(w, ErrResp{err.Error()}, http.StatusInternalServerError)
 			return
 		}
 	} else {
@@ -27,13 +27,13 @@ func taskDoneHandler(w http.ResponseWriter, r *http.Request) {
 
 		next, err := NextDate(now, task.Date, task.Repeat)
 		if err != nil {
-			writeJson(w, ErrResp{ErrGetTask.Error()}, http.StatusInternalServerError)
+			writeJson(w, ErrResp{err.Error()}, http.StatusInternalServerError)
 			return
 		}
 
 		err = db.UpdateTaskDate(next, rId)
 		if err != nil {
-			writeJson(w, ErrResp{ErrGetTask.Error()}, http.StatusInternalServerError)
+			writeJson(w, ErrResp{err.Error()}, http.StatusInternalServerError)
 			return
 		}
 	}

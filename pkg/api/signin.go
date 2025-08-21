@@ -12,7 +12,6 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-var ErrBadPass = errors.New("ошибка неверный пароль")
 var ErrBadSignToken = errors.New("ошибка не удалось подписать токен")
 
 var secretKey = []byte("my_secret_key")
@@ -33,13 +32,13 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(buf.Bytes(), &user)
 	if err != nil {
-		writeJson(w, ErrResp{"ошибка десериализации JSON"}, http.StatusBadRequest)
+		writeJson(w, ErrResp{err.Error()}, http.StatusBadRequest)
 		return
 	}
 
 	ePass := os.Getenv("TODO_PASSWORD")
 	if user.Password != ePass {
-		writeJson(w, ErrResp{ErrBadPass.Error()}, http.StatusBadRequest)
+		writeJson(w, ErrResp{"invalid password"}, http.StatusBadRequest)
 		return
 	}
 
@@ -50,7 +49,7 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 
 	signedToken, err := jwtToken.SignedString(secretKey)
 	if err != nil {
-		writeJson(w, ErrResp{ErrBadSignToken.Error()}, http.StatusBadRequest)
+		writeJson(w, ErrResp{err.Error()}, http.StatusBadRequest)
 		return
 	}
 
