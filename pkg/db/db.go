@@ -1,0 +1,56 @@
+package db
+
+import (
+	"database/sql"
+	"os"
+
+	"github.com/Dmitry-CH/go-final-project/pkg/config"
+	_ "modernc.org/sqlite"
+)
+
+const schema = `CREATE TABLE scheduler (
+					id INTEGER PRIMARY KEY AUTOINCREMENT,
+					date CHAR(8) NOT NULL DEFAULT "",
+					title VARCHAR(256) NOT NULL DEFAULT "",
+					comment TEXT NOT NULL DEFAULT "",
+					repeat VARCHAR(128) NOT NULL DEFAULT ""
+);
+
+CREATE INDEX idx_scheduler_date ON scheduler (date);`
+
+var db *sql.DB
+var dbFile = "scheduler.db"
+
+func Close() error {
+	return db.Close()
+}
+
+func Init() error {
+	var install bool
+
+	conf := config.New()
+
+	_, err := os.Stat(dbFile)
+	if err != nil {
+		install = true
+	}
+
+	eDbFile := conf.DBfile
+	if len(eDbFile) > 0 {
+		dbFile = eDbFile
+	}
+
+	db, err = sql.Open("sqlite", dbFile)
+	if err != nil {
+		return err
+	}
+
+	if install {
+		_, err = db.Exec(schema)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
