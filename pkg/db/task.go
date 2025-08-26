@@ -107,6 +107,9 @@ func GetTasks(limit int, search, date string) ([]*Task, error) {
 
 		tasks = append(tasks, &task)
 	}
+	if err := rows.Err(); err != nil {
+		return []*Task{}, err
+	}
 
 	return tasks, nil
 }

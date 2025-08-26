@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
+	"github.com/Dmitry-CH/go-final-project/pkg/config"
 	"github.com/Dmitry-CH/go-final-project/pkg/db"
 	"github.com/golang-jwt/jwt"
 )
@@ -40,8 +40,10 @@ func Init() {
 }
 
 func auth(next http.HandlerFunc) http.HandlerFunc {
+	conf := config.New()
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ePass := os.Getenv("TODO_PASSWORD")
+		ePass := conf.Password
 		if len(ePass) > 0 {
 			var rToken string
 			var valid bool
@@ -86,5 +88,9 @@ func writeJson(w http.ResponseWriter, data any, statusCode ...int) {
 	if len(statusCode) > 0 {
 		w.WriteHeader(statusCode[0])
 	}
-	w.Write(resp)
+
+	_, err = w.Write(resp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

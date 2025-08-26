@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"os"
 
+	"github.com/Dmitry-CH/go-final-project/pkg/config"
 	_ "modernc.org/sqlite"
 )
 
@@ -27,12 +28,14 @@ func Close() error {
 func Init() error {
 	var install bool
 
+	conf := config.New()
+
 	_, err := os.Stat(dbFile)
 	if err != nil {
 		install = true
 	}
 
-	eDbFile := os.Getenv("TODO_DBFILE")
+	eDbFile := conf.DBfile
 	if len(eDbFile) > 0 {
 		dbFile = eDbFile
 	}

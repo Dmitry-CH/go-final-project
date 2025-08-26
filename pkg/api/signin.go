@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"os"
 
+	"github.com/Dmitry-CH/go-final-project/pkg/config"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -24,6 +24,8 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 	var buf bytes.Buffer
 	var user user
 
+	conf := config.New()
+
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
 		writeJson(w, ErrResp{err.Error()}, http.StatusBadRequest)
@@ -36,7 +38,7 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ePass := os.Getenv("TODO_PASSWORD")
+	ePass := conf.Password
 	if user.Password != ePass {
 		writeJson(w, ErrResp{"invalid password"}, http.StatusBadRequest)
 		return
